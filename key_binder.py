@@ -1,9 +1,13 @@
 import threading
 
-from Xlib.display import Display
+import gi
 from Xlib import X
+from Xlib.display import Display
 from Xlib.ext import record
 from Xlib.protocol import rq
+
+gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
+from gi.repository import Keybinder as XlibKeybinder
 
 
 class KeyBinder:
@@ -15,10 +19,11 @@ class KeyBinder:
     def listen_hold(self, key, pressed_callback, released_callback):
         self._hold_keys[key] = (pressed_callback, released_callback)
 
-    def listen_key_press(self, key, pressed_callback):
-        self._hold_keys[ord(key)] = (pressed_callback, None)
+    def bind_to_keys(self, keys, pressed_callback, *args):
+        return XlibKeybinder.bind(keys, pressed_callback, *args)
 
     def start(self):
+        XlibKeybinder.init()
         threading.Thread(target=self.run).start()
 
     def run(self):
@@ -45,7 +50,7 @@ class KeyBinder:
             event, data = rq.EventField(None).parse_binary_value(data, self._display.display, None, None)
 
             keysym = self._display.keycode_to_keysym(event.detail, 0)
-            # print(event.detail, keysym)
+
             if keysym in self._hold_keys.keys():
                 pressed_callback, released_callback = self._hold_keys[keysym]
                 if event.type == X.KeyPress:

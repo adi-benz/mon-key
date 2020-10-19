@@ -5,8 +5,8 @@ import gi
 from Xlib import XK
 
 from key_binder import KeyBinder
-from windows_switcher import WindowsSwitcher
 from window_manager import WindowManager
+from windows_switcher import WindowsSwitcher
 
 gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
 from gi.repository import Gtk, Wnck, Keybinder, GdkX11, Gdk
@@ -33,12 +33,12 @@ class QuickDraw:
         Gtk.init([])
 
         keybinder = KeyBinder()
+
         keybinder.listen_hold(XK.XK_Hyper_L, self._start, self._stop)
 
         for key_binding, window_class in KEY_BINDINGS.items():
-            if not Keybinder.bind(key_binding, self._focus_window, window_class):
+            if not keybinder.bind_to_keys(key_binding, self._focus_window, window_class):
                 print(f'Failed binding key {key_binding} to open {window_class}')
-        Keybinder.init()
 
         keybinder.start()
 
