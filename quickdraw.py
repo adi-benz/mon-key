@@ -50,6 +50,8 @@ class QuickDraw:
             print("ERROR: Modifier not held: ", self._windows_switcher)
             return
         if self._windows_switcher.get_class_name() != window_class_name:
+            self._windows_switcher.stop()
+            self._windows_switcher = WindowsSwitcher(self._window_manager)
             self._windows_switcher.start(window_class_name)
 
         for window in self._windows_switcher:
@@ -66,5 +68,7 @@ class QuickDraw:
         print('start')
 
     def _stop(self):
+        if self._windows_switcher:
+            self._windows_switcher.stop()
         self._windows_switcher = None
         print('stop')
