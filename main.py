@@ -1,4 +1,9 @@
+import faulthandler
+
 from smartswitch import SmartSwitch
+
+
+faulthandler.enable()
 
 
 def main():
