@@ -1,3 +1,4 @@
+import threading
 import traceback
 from datetime import datetime
 from typing import Optional
@@ -29,6 +30,7 @@ class SmartSwitch:
         self._window_manager: WindowManager = WindowManager()
         self._window_manager.start()
         self._windows_switcher: Optional[WindowsSwitcher] = None
+        self._windows_switcher_lock = threading.Lock()
 
     def start(self):
         Gtk.init([])
@@ -47,18 +49,19 @@ class SmartSwitch:
 
     def _focus_window(self, keys, window_class_name):
         print(f"{keys} binding pressed")
-        if not self._windows_switcher:
-            self._windows_switcher = WindowsSwitcher(self._window_manager)
-            self._windows_switcher.start(window_class_name)
-        elif self._windows_switcher.get_class_name() != window_class_name:
-            self._windows_switcher.stop()
-            self._windows_switcher = WindowsSwitcher(self._window_manager)
-            self._windows_switcher.start(window_class_name)
+        with self._windows_switcher_lock:
+            if not self._windows_switcher:
+                self._windows_switcher = WindowsSwitcher(self._window_manager)
+                self._windows_switcher.start(window_class_name)
+            elif self._windows_switcher.get_class_name() != window_class_name:
+                self._windows_switcher.stop()
+                self._windows_switcher = WindowsSwitcher(self._window_manager)
+                self._windows_switcher.start(window_class_name)
 
-        for window in self._windows_switcher:
-            window.activate(self._get_server())
-            print(f'{str(datetime.now())}: Focus {window_class_name}: {window.get_name()}')
-            break
+            for window in self._windows_switcher:
+                window.activate(self._get_server())
+                print(f'{str(datetime.now())}: Focus {window_class_name}: {window.get_name()}')
+                break
 
     def _get_server(self):
         server_time = GdkX11.x11_get_server_time(Gdk.get_default_root_window())
@@ -68,7 +71,8 @@ class SmartSwitch:
         print('start')
 
     def _stop(self):
-        if self._windows_switcher:
-            self._windows_switcher.stop()
-        self._windows_switcher = None
+        with self._windows_switcher_lock:
+            if self._windows_switcher:
+                self._windows_switcher.stop()
+            self._windows_switcher = None
         print('stop')
