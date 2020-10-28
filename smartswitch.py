@@ -65,7 +65,7 @@ class SmartSwitch:
         return server_time
 
     def _start(self):
-        pass
+        print('start')
 
     def _stop(self):
         if self._windows_switcher:
