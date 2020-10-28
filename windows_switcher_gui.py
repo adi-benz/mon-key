@@ -16,12 +16,20 @@ class WindowsSwitcherGui:
 
         self._window = builder.get_object('popup-window')
         self._list_box = builder.get_object('windows-list')
+        self._app_icon_image = builder.get_object('app-icon')
+        self._app_name_label = builder.get_object('app-name')
         self._windows = []
+        self._window.hide()
 
     def show(self, windows):
         self._windows = windows
         for window in self._windows:
             self._list_box.add(WindowListBoxRow(window.get_name(), window.get_workspace().get_name()))
+        if any(self._windows):
+            self._app_name_label.set_label(self._windows[0].get_class_group_name())
+            app_icon = self._windows[0].get_icon()
+            if app_icon:
+                self._app_icon_image.set_from_pixbuf(app_icon)
         self._window.show_all()
 
     def close(self):
