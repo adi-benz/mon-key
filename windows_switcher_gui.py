@@ -7,18 +7,15 @@ from gi.repository import Gtk, Gdk
 class WindowsSwitcherGui:
 
     def __init__(self):
-        self._window = Gtk.Window()
-        self._window.set_title('Quick Draw')
-        self._window.set_decorated(False)
-        self._window.set_resizable(False)
-        self._window.stick()
-        self._window.set_type_hint(Gdk.WindowTypeHint.DOCK)
-        self._window.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
+        provider = Gtk.CssProvider()
+        provider.load_from_path("ui/style.css")
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
-        self._list_box = Gtk.ListBox()
-        self._list_box.set_size_request(600, 50)
-        self._window.add(self._list_box)
+        builder = Gtk.Builder()
+        builder.add_from_file('ui/popup-window.ui')
 
+        self._window = builder.get_object('popup-window')
+        self._list_box = builder.get_object('windows-list')
         self._windows = []
 
     def show(self, windows):

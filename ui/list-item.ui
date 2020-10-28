@@ -2,11 +2,7 @@
 <!-- Generated with glade 3.36.0 -->
 <interface>
   <requires lib="gtk+" version="3.22"/>
-  <object class="GtkListBox">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="hexpand">True</property>
-  </object>
+  <!-- interface-css-provider-path style.css -->
   <object class="GtkBox" id="list-item">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -57,5 +53,8 @@
         <property name="position">1</property>
       </packing>
     </child>
+    <style>
+      <class name="list-item"/>
+    </style>
   </object>
 </interface>

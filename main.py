@@ -1,8 +1,8 @@
-from quickdraw import QuickDraw
+from smartswitch import SmartSwitch
 
 
 def main():
-    QuickDraw().start()
+    SmartSwitch().start()
 
 
 if __name__ == '__main__':

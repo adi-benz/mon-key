@@ -1,3 +1,4 @@
+import traceback
 from datetime import datetime
 from typing import Optional
 
@@ -19,7 +20,7 @@ KEY_BINDINGS = {
 }
 
 
-class QuickDraw:
+class SmartSwitch:
 
     def __init__(self):
         self._screen = Wnck.Screen.get_default()
@@ -47,9 +48,9 @@ class QuickDraw:
     def _focus_window(self, keys, window_class_name):
         print(f"{keys} binding pressed")
         if not self._windows_switcher:
-            print("ERROR: Modifier not held: ", self._windows_switcher)
-            return
-        if self._windows_switcher.get_class_name() != window_class_name:
+            self._windows_switcher = WindowsSwitcher(self._window_manager)
+            self._windows_switcher.start(window_class_name)
+        elif self._windows_switcher.get_class_name() != window_class_name:
             self._windows_switcher.stop()
             self._windows_switcher = WindowsSwitcher(self._window_manager)
             self._windows_switcher.start(window_class_name)
@@ -64,8 +65,7 @@ class QuickDraw:
         return server_time
 
     def _start(self):
-        self._windows_switcher = WindowsSwitcher(self._window_manager)
-        print('start')
+        pass
 
     def _stop(self):
         if self._windows_switcher:

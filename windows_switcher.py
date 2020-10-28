@@ -6,8 +6,8 @@ class WindowsSwitcher:
 
     def __init__(self, window_manager: WindowManager):
         self._window_manager = window_manager
-        self._windows_switcher_gui = WindowsSwitcherGui()
         self._class_name = None
+        self._windows_switcher_gui = None
 
     def start(self, class_name: str):
         self._class_name = class_name
@@ -19,11 +19,13 @@ class WindowsSwitcher:
             self._index = 1
         else:
             self._index = 0
-        self._windows_switcher_gui.show(self._windows)
+        self._windows_switcher_gui = WindowsSwitcherGui()
+        if any(self._windows):
+            self._windows_switcher_gui.show(self._windows)
 
     def stop(self):
-        pass
-        self._windows_switcher_gui.close()
+        if self._windows_switcher_gui:
+            self._windows_switcher_gui.close()
 
     def get_class_name(self):
         return self._class_name
