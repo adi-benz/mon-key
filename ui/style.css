@@ -1,5 +1,34 @@
+.main-window {
+    background-color: transparent;
+}
+
+.main-layout {
+    background-color: #242424;
+    border-radius: 20px;
+    margin: 20px;
+    border: 1px solid #3b3b3b;
+    box-shadow: 0px 0px 2px 0px;
+}
+
+.app-name {
+    color: #dbdbdb;
+}
+
+.window-name {
+    color: #dbdbdb;
+}
+
+.workspace-name {
+    color: #595959;
+}
+
 .windows-list {
     padding: 5px;
+    background-color: #242424;
+}
+
+.windows-list > row:selected {
+    background-color: #787878;
 }
 
 .app_icon {

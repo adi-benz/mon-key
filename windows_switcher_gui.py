@@ -9,7 +9,8 @@ class WindowsSwitcherGui:
     def __init__(self):
         provider = Gtk.CssProvider()
         provider.load_from_path("ui/style.css")
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
+                                                 Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         builder = Gtk.Builder()
         builder.add_from_file('ui/popup-window.ui')

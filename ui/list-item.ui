@@ -14,6 +14,9 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="label" translatable="yes">Workspace 1</property>
+        <style>
+          <class name="workspace-name"/>
+        </style>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -34,9 +37,9 @@
             <property name="label" translatable="yes">This is just a demonistration</property>
             <property name="ellipsize">end</property>
             <property name="single_line_mode">True</property>
-            <attributes>
-              <attribute name="foreground" value="#2e2e34343636"/>
-            </attributes>
+            <style>
+              <class name="window-name"/>
+            </style>
           </object>
           <packing>
             <property name="expand">False</property>
