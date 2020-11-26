@@ -8,6 +8,7 @@ from Xlib.protocol import rq
 
 gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
 from gi.repository import Keybinder as XlibKeybinder
+from gi.repository import GLib
 
 
 class KeyBinder:
@@ -55,7 +56,7 @@ class KeyBinder:
                 pressed_callback, released_callback = self._hold_keys[keysym]
                 if event.type == X.KeyPress:
                     if pressed_callback:
-                        pressed_callback()
+                        GLib.idle_add(pressed_callback)
                 elif event.type == X.KeyRelease:
                     if released_callback:
-                        released_callback()
+                        GLib.idle_add(released_callback)
