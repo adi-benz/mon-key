@@ -22,6 +22,7 @@ class WindowsSwitcher:
         self._windows_switcher_gui = WindowsSwitcherGui()
         if any(self._windows):
             self._windows_switcher_gui.show(self._windows)
+            self._select_current_window()
 
     def stop(self):
         if self._windows_switcher_gui:
@@ -37,13 +38,20 @@ class WindowsSwitcher:
         try:
             # Some window might have been closed while switching windows
             self.refresh_windows()
-            next_window = self._windows[self._index]
             has_reached_the_end = self._index + 1 >= len(self._windows)
             self._index = 0 if has_reached_the_end else self._index + 1
-            self._windows_switcher_gui.select(next_window)
+            self._select_current_window()
+            next_window = self._windows[self._index]
             return next_window
         except IndexError:
             raise StopIteration
+
+    def _select_current_window(self):
+        next_window = self._windows[self._index]
+        self._windows_switcher_gui.select(next_window)
+
+    def selected_window(self):
+        return self._windows[self._index]
 
     def refresh_windows(self):
         new_windows = [window for window in self._windows if self._window_manager.contains(window)]
