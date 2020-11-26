@@ -51,14 +51,17 @@ class SmartSwitch:
         if not self._windows_switcher:
             self._create_window_switcher(window_class_name)
         elif self._windows_switcher.get_class_name() != window_class_name:
-            self._windows_switcher.stop()
+            self._windows_switcher.close()
             self._create_window_switcher(window_class_name)
         else:
-            next(self._windows_switcher)
+            try:
+                self._windows_switcher.select_next()
+            except KeyError:
+                self._close_windows_switcher()
 
     def _create_window_switcher(self, window_class_name):
         self._windows_switcher = WindowsSwitcher(self._window_manager)
-        self._windows_switcher.start(window_class_name)
+        self._windows_switcher.open(window_class_name)
 
     def _get_server_time(self):
         server_time = GdkX11.x11_get_server_time(Gdk.get_default_root_window())
@@ -69,16 +72,20 @@ class SmartSwitch:
 
     def _mod_up(self):
         print('_mod_up()')
-        selected_window = self._windows_switcher.selected_window()
+        if not self._windows_switcher:
+            return
 
+        selected_window = self._windows_switcher.selected_window()
         self._close_windows_switcher()
 
-        def activate_selected_window():
-            selected_window.activate(self._get_server_time())
-            print(f'\t{str(datetime.now())}: Focus {selected_window.get_class_group_name()}: {selected_window.get_name()}')
-        GLib.idle_add(activate_selected_window)
+        if selected_window:
+            GLib.idle_add(self._activate_window, selected_window)
+
+    def _activate_window(self, window):
+        window.activate(self._get_server_time())
+        print(f'\t{str(datetime.now())}: Focus {window.get_class_group_name()}: {window.get_name()}')
 
     def _close_windows_switcher(self):
         if self._windows_switcher:
-            self._windows_switcher.stop()
+            self._windows_switcher.close()
         self._windows_switcher = None
