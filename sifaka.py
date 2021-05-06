@@ -9,8 +9,8 @@ from window_manager import WindowManager
 from windows_switcher import WindowsSwitcher
 
 gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
+# noinspection PyUnresolvedReferences
 from gi.repository import Gtk, Wnck, GdkX11, Gdk, GLib
-
 
 KEY_BINDINGS = {
     '<Hyper>w': 'Google-chrome',
