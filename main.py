@@ -1,13 +1,13 @@
 import faulthandler
 
-from smartswitch import SmartSwitch
+from sifaka import Sifaka
 
 
 faulthandler.enable()
 
 
 def main():
-    SmartSwitch().start()
+    Sifaka().start()
 
 
 if __name__ == '__main__':

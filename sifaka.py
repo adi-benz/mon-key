@@ -1,5 +1,3 @@
-import threading
-import traceback
 from datetime import datetime
 from typing import Optional
 
@@ -21,7 +19,7 @@ KEY_BINDINGS = {
 }
 
 
-class SmartSwitch:
+class Sifaka:
 
     def __init__(self):
         self._screen = Wnck.Screen.get_default()
