@@ -15,7 +15,8 @@ from gi.repository import Gtk, Wnck, Keybinder, GdkX11, Gdk, GLib
 KEY_BINDINGS = {
     '<Hyper>w': 'Google-chrome',
     '<Hyper>t': 'Tilix',
-    '<Hyper>c': 'jetbrains-pycharm-ce'
+    '<Hyper>c': 'jetbrains-pycharm-ce',
+    '<Hyper>p': 'okular',
 }
 
 
