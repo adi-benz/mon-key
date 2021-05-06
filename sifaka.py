@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 import gi
+import faulthandler
 from Xlib import XK
 
 from key_binder import KeyBinder
@@ -11,6 +12,8 @@ from windows_switcher import WindowsSwitcher
 gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
 # noinspection PyUnresolvedReferences
 from gi.repository import Gtk, Wnck, GdkX11, Gdk, GLib
+
+faulthandler.enable()
 
 KEY_BINDINGS = {
     '<Hyper>w': 'Google-chrome',
@@ -88,3 +91,11 @@ class Sifaka:
         if self._windows_switcher:
             self._windows_switcher.close()
         self._windows_switcher = None
+
+
+def main():
+    Sifaka().start()
+
+
+if __name__ == '__main__':
+    main()
