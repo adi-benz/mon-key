@@ -19,7 +19,8 @@ KEY_BINDINGS = {
     '<Hyper>w': 'Google-chrome',
     '<Hyper>t': 'Tilix',
     '<Hyper>c': 'jetbrains-pycharm-ce',
-    '<Hyper>p': 'okular',
+    '<Hyper>q': 'okular',
+    '<Hyper>o': 'jetbrains-clion',
 }
 
 
