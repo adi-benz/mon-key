@@ -36,11 +36,15 @@ class Sifaka:
 
     def start(self):
         Gtk.init([])
+        GLib.threads_init()
+        Gdk.threads_init()
 
         keybinder = KeyBinder(MODIFIERS, KEY_BINDINGS.keys(), self._mod_down, self._mod_up, self._focus_window)
         keybinder.start()
 
+        Gdk.threads_enter()
         Gtk.main()
+        Gdk.threads_leave()
 
     def _focus_window(self, key):
         print(f"{key} binding pressed")

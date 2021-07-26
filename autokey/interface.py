@@ -323,14 +323,10 @@ class XInterfaceBase(threading.Thread):
 
         Used when a new window is created
         """
-        c = self.app.configManager
-        hotkeys = c.hotKeys + c.hotKeyFolders
-        window_info = self.get_window_info(window)
-        for item in hotkeys:
-            if item.get_applicable_regex() is not None and item._should_trigger_window_title(window_info):
-                self.__enqueue(self.__grabHotkey, item.hotKey, item.modifiers, window)
-            elif self.__needsMutterWorkaround(item):
-                self.__enqueue(self.__grabHotkey, item.hotKey, item.modifiers, window)
+        for hotkey in self._hotkeys:
+            self.__enqueue(self.__grabHotkey, hotkey, window)
+            if self.__needsMutterWorkaround(hotkey):
+                self.__enqueue(self.__grabHotkey, hotkey, window)
 
     def __grabHotkey(self, hotkey: Hotkey, window):
         """

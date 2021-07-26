@@ -40,8 +40,8 @@ class Listener(HotkeyListener):
 
     def handle_keypress(self, key):
         if key in self._keys and self._modifiers == self._active_modifiers:
-            self._key_press(key)
             print(f'keypress: {key}')
+            GLib.idle_add(self._key_press, key)
 
 
 class KeyBinder:
