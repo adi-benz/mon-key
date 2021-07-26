@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 
 import gi
@@ -15,12 +16,23 @@ from gi.repository import Gtk, Wnck, GdkX11, Gdk, GLib
 
 faulthandler.enable()
 
+
+class Modifier(Enum):
+    HYPER = (XK.XK_Hyper_L, '<Hyper>')
+    SUPER = (XK.XK_Super_L, '<Super>')
+
+    def __init__(self, xk_value, string_value):
+        self.string_value = string_value
+        self.xk_value = xk_value
+
+
+MODIFIER = Modifier.HYPER
 KEY_BINDINGS = {
-    '<Hyper>w': 'Google-chrome',
-    '<Hyper>t': 'Tilix',
-    '<Hyper>c': 'jetbrains-pycharm-ce',
-    '<Hyper>q': 'okular',
-    '<Hyper>o': 'jetbrains-clion',
+    'w': 'Google-chrome',
+    't': 'Tilix',
+    'c': 'jetbrains-pycharm-ce',
+    'q': 'okular',
+    'o': 'jetbrains-clion',
 }
 
 
@@ -39,10 +51,11 @@ class Sifaka:
 
         keybinder = KeyBinder()
 
-        keybinder.listen_hold(XK.XK_Hyper_L, self._mod_down, self._mod_up)
+        keybinder.listen_hold(MODIFIER.xk_value, self._mod_down, self._mod_up)
 
         for key_binding, window_class in KEY_BINDINGS.items():
-            if not keybinder.bind_to_keys(key_binding, self._focus_window, window_class):
+            hotkey = MODIFIER.string_value + key_binding
+            if not keybinder.bind_to_keys(hotkey, self._focus_window, window_class):
                 print(f'Failed binding key {key_binding} to open {window_class}')
 
         keybinder.start()
