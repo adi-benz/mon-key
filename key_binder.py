@@ -6,57 +6,55 @@ from Xlib.display import Display
 from Xlib.ext import record
 from Xlib.protocol import rq
 
+from autokey.hotkey import Hotkey
+from autokey.hotkey_listener import HotkeyListener
+from autokey.interface import XRecordInterface
+from autokey.key import Key
+
 gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
-from gi.repository import Keybinder as XlibKeybinder
-from gi.repository import GLib
+from gi.repository import GLib, Gdk
+
+
+class Listener(HotkeyListener):
+    def __init__(self, modifiers, keys, mod_down, mod_up, key_press):
+        self._modifiers = set(modifiers)
+        self._keys = keys
+        self._mod_down = mod_down
+        self._mod_up = mod_up
+        self._key_press = key_press
+
+        self._active_modifiers = set()
+
+    def handle_modifier_down(self, modifier: Key):
+        modifier = modifier.value
+        if modifier not in self._active_modifiers:
+            self._active_modifiers.add(modifier)
+        self._mod_down(modifier)
+
+    def handle_modifier_up(self, modifier: Key):
+        modifier = modifier.value
+        self._mod_up(modifier)
+        if modifier in self._active_modifiers:
+            self._active_modifiers.remove(modifier)
+        print(f'modifier up: {modifier}')
+
+    def handle_keypress(self, key):
+        if key in self._keys and self._modifiers == self._active_modifiers:
+            self._key_press(key)
+            print(f'keypress: {key}')
 
 
 class KeyBinder:
 
-    def __init__(self):
-        self._hold_keys = {}
+    def __init__(self, modifiers, keys, mod_down, mod_up, key_press):
+        self._modifiers = modifiers
+        self._keys = keys
         self._display = Display()
-
-    def listen_hold(self, key, pressed_callback, released_callback):
-        self._hold_keys[key] = (pressed_callback, released_callback)
-
-    def bind_to_keys(self, keys, pressed_callback, *args):
-        return XlibKeybinder.bind(keys, pressed_callback, *args)
+        self._listener = Listener(modifiers, keys, mod_down, mod_up, key_press)
+        hotkeys = [Hotkey(self._modifiers, key) for key in self._keys]
+        self._interface = XRecordInterface(hotkeys, self._listener)
 
     def start(self):
-        XlibKeybinder.init()
-        threading.Thread(target=self.run).start()
+        self._interface.initialise()
+        self._interface.start()
 
-    def run(self):
-        context = self._display.record_create_context(
-            0,
-            [record.AllClients],
-            [{
-                'core_requests': (0, 0),
-                'core_replies': (0, 0),
-                'ext_requests': (0, 0, 0, 0),
-                'ext_replies': (0, 0, 0, 0),
-                'delivered_events': (0, 0),
-                'device_events': (X.KeyReleaseMask, X.ButtonReleaseMask),
-                'errors': (0, 0),
-                'client_started': False,
-                'client_died': False,
-            }])
-        self._display.record_enable_context(context, self._event_handler)
-        self._display.record_free_context(context)
-
-    def _event_handler(self, reply):
-        data = reply.data
-        while len(data):
-            event, data = rq.EventField(None).parse_binary_value(data, self._display.display, None, None)
-
-            keysym = self._display.keycode_to_keysym(event.detail, 0)
-
-            if keysym in self._hold_keys.keys():
-                pressed_callback, released_callback = self._hold_keys[keysym]
-                if event.type == X.KeyPress:
-                    if pressed_callback:
-                        GLib.idle_add(pressed_callback)
-                elif event.type == X.KeyRelease:
-                    if released_callback:
-                        GLib.idle_add(released_callback)

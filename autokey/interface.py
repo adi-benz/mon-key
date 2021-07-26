@@ -16,6 +16,7 @@ import Xlib.threaded as xlib_threaded
 # This (hopefully) also prevents automatic code cleanup software from deleting an "unused" import and re-introduce
 # issues.
 from autokey.hotkey import Hotkey
+from autokey.hotkey_listener import HotkeyListener
 from autokey.key import Key
 from autokey.key import _ALL_MODIFIERS_ as MODIFIERS
 
@@ -88,9 +89,10 @@ class XInterfaceBase(threading.Thread):
     Encapsulates the common functionality for the two X interface classes.
     """
 
-    def __init__(self, hotkeys: typing.List[Hotkey]):
+    def __init__(self, hotkeys: typing.List[Hotkey], hotkey_listener: HotkeyListener):
         threading.Thread.__init__(self)
         self._hotkeys = hotkeys
+        self._hotkey_listener = hotkey_listener
         self.setDaemon(True)
         self.setName("XInterface-thread")
         self.lastChars = [] # QT4 Workaround
@@ -539,14 +541,11 @@ class XInterfaceBase(threading.Thread):
         self.__enqueue(self.__handleKeyPress, keyCode)
     
     def __handleKeyPress(self, keyCode):
-        focus = self.localDisplay.get_input_focus().focus
-
         modifier = self.__decodeModifier(keyCode)
         if modifier is not None:
-            self.mediator.handle_modifier_down(modifier)
+            self._hotkey_listener.handle_modifier_down(modifier)
         else:
-            window_info = self.get_window_info(focus)
-            self.mediator.handle_keypress(keyCode, window_info)
+            self._hotkey_listener.handle_keypress(self.lookup_string(keyCode, False, False, False))
 
     def handle_keyrelease(self, keyCode):
         self.__enqueue(self.__handleKeyrelease, keyCode)
@@ -554,7 +553,7 @@ class XInterfaceBase(threading.Thread):
     def __handleKeyrelease(self, keyCode):
         modifier = self.__decodeModifier(keyCode)
         if modifier is not None:
-            self.mediator.handle_modifier_up(modifier)
+            self._hotkey_listener.handle_modifier_up(modifier)
 
     def __decodeModifier(self, keyCode):
         """
@@ -726,7 +725,7 @@ class XRecordInterface(XInterfaceBase):
                         'ext_requests': (0, 0, 0, 0),
                         'ext_replies': (0, 0, 0, 0),
                         'delivered_events': (0, 0),
-                        'device_events': (X.KeyPress, X.ButtonPress), #X.KeyRelease,
+                        'device_events': (X.KeyPress, X.KeyRelease), #X.KeyRelease,
                         'errors': (0, 0),
                         'client_started': False,
                         'client_died': False,
@@ -760,8 +759,6 @@ class XRecordInterface(XInterfaceBase):
                 self.handle_keypress(event.detail)
             elif event.type == X.KeyRelease:
                 self.handle_keyrelease(event.detail)
-            elif event.type == X.ButtonPress:
-                self.handle_mouseclick(event.detail, event.root_x, event.root_y)
 
 
 class AtSpiInterface(XInterfaceBase):
