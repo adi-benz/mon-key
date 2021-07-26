@@ -3,6 +3,7 @@ from typing import Optional
 
 import gi
 import faulthandler
+from Xlib import XK
 
 from key_binder import KeyBinder
 from window_manager import WindowManager
@@ -14,13 +15,12 @@ from gi.repository import Gtk, Wnck, GdkX11, Gdk, GLib
 
 faulthandler.enable()
 
-MODIFIERS = ["<hyper>"]
 KEY_BINDINGS = {
-    'w': 'Google-chrome',
-    't': 'Tilix',
-    'c': 'jetbrains-pycharm-ce',
-    'q': 'okular',
-    'o': 'jetbrains-clion',
+    '<Hyper>w': 'Google-chrome',
+    '<Hyper>t': 'Tilix',
+    '<Hyper>c': 'jetbrains-pycharm-ce',
+    '<Hyper>q': 'okular',
+    '<Hyper>o': 'jetbrains-clion',
 }
 
 
@@ -36,20 +36,21 @@ class Sifaka:
 
     def start(self):
         Gtk.init([])
-        GLib.threads_init()
-        Gdk.threads_init()
 
-        keybinder = KeyBinder(MODIFIERS, KEY_BINDINGS.keys(), self._mod_down, self._mod_up, self._focus_window)
+        keybinder = KeyBinder()
+
+        keybinder.listen_hold(XK.XK_Hyper_L, self._mod_down, self._mod_up)
+
+        for key_binding, window_class in KEY_BINDINGS.items():
+            if not keybinder.bind_to_keys(key_binding, self._focus_window, window_class):
+                print(f'Failed binding key {key_binding} to open {window_class}')
+
         keybinder.start()
 
-        Gdk.threads_enter()
         Gtk.main()
-        Gdk.threads_leave()
 
-    def _focus_window(self, key):
-        print(f"{key} binding pressed")
-        window_class_name = KEY_BINDINGS[key]
-
+    def _focus_window(self, keys, window_class_name):
+        print(f"{keys} binding pressed")
         if not self._windows_switcher:
             self._create_window_switcher(window_class_name)
         elif self._windows_switcher.get_class_name() != window_class_name:
@@ -69,10 +70,10 @@ class Sifaka:
         server_time = GdkX11.x11_get_server_time(Gdk.get_default_root_window())
         return server_time
 
-    def _mod_down(self, _modifier):
+    def _mod_down(self):
         print('_mod_down()')
 
-    def _mod_up(self, _modifier):
+    def _mod_up(self):
         print('_mod_up()')
         if not self._windows_switcher:
             return
