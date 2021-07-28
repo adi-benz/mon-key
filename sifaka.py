@@ -17,6 +17,9 @@ from gi.repository import Gtk, Wnck, GdkX11, Gdk, GLib
 faulthandler.enable()
 
 
+ESC_KEY = XK.XK_Escape
+
+
 class Modifier(Enum):
     HYPER = (XK.XK_Hyper_L, '<Hyper>')
     SUPER = (XK.XK_Super_L, '<Super>')
@@ -52,6 +55,7 @@ class Sifaka:
         keybinder = KeyBinder()
 
         keybinder.listen_hold(MODIFIER.xk_value, self._mod_down, self._mod_up)
+        keybinder.listen_hold(ESC_KEY, self._esc_down, self._esc_up)
 
         for key_binding, window_class in KEY_BINDINGS.items():
             hotkey = MODIFIER.string_value + key_binding
@@ -105,6 +109,14 @@ class Sifaka:
         if self._windows_switcher:
             self._windows_switcher.close()
         self._windows_switcher = None
+
+    def _esc_down(self):
+        if self._windows_switcher:
+            self._windows_switcher.close()
+            self._windows_switcher = None
+
+    def _esc_up(self):
+        pass
 
 
 def main():
