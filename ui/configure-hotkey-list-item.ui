@@ -44,8 +44,8 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="button_configureHotkey">
-            <property name="label" translatable="yes">Set...</property>
+          <object class="GtkButton" id="button_editHotkey">
+            <property name="label" translatable="yes">✏️</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
