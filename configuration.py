@@ -21,14 +21,12 @@ class Configuration:
         if not self._HOTKEYS_FILE.exists():
             with self._HOTKEYS_FILE.open('w') as hotkeys_file:
                 json.dump({
-                    'modifier': DEFAULT_MODIFIER.string_value,
+                    'modifier': DEFAULT_MODIFIER.name,
                     'hotkeys': []
                 }, hotkeys_file)
 
     def modifier(self) -> Modifier:
-        # TODO: Support saving modifier to configuration file
-        # return self._read_configuration()['modifier']
-        return Modifier.HYPER
+        return Modifier[self._read_configuration()['modifier']]
 
     def hotkeys(self) -> List[Hotkey]:
         return [Hotkey(*x) for x in self._read_configuration()['hotkeys']]
