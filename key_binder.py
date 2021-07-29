@@ -16,6 +16,7 @@ class KeyBinder:
     def __init__(self):
         self._hold_keys = {}
         self._display = Display()
+        self._context = None
 
     def listen_hold(self, key, pressed_callback, released_callback):
         self._hold_keys[key] = (pressed_callback, released_callback)
@@ -27,8 +28,14 @@ class KeyBinder:
         XlibKeybinder.init()
         threading.Thread(target=self.run).start()
 
+    def stop(self):
+        # TODO: Not really working
+        self._display.ungrab_pointer(X.CurrentTime)
+        self._display.record_disable_context(self._context)
+        self._display.flush()
+
     def run(self):
-        context = self._display.record_create_context(
+        self._context = self._display.record_create_context(
             0,
             [record.AllClients],
             [{
@@ -42,8 +49,9 @@ class KeyBinder:
                 'client_started': False,
                 'client_died': False,
             }])
-        self._display.record_enable_context(context, self._event_handler)
-        self._display.record_free_context(context)
+        self._display.record_enable_context(self._context, self._event_handler)
+        self._display.record_free_context(self._context)
+        self._display.close()
 
     def _event_handler(self, reply):
         data = reply.data

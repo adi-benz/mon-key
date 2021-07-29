@@ -1,11 +1,8 @@
-import sys
+import faulthandler
 from datetime import datetime
-from enum import Enum
 from typing import Optional
 
 import gi
-import faulthandler
-from Xlib import XK
 
 import keys
 from configuration import Configuration
@@ -44,18 +41,17 @@ class Sifaka:
         self._build_app_indicator()
         Gtk.init([])
 
-        keybinder = KeyBinder()
-
         configuration = Configuration()
-        keybinder.listen_hold(configuration.modifier().xk_value, self._mod_down, self._mod_up)
-        keybinder.listen_hold(keys.ESC_KEY, self._esc_down, self._esc_up)
+        self._keybinder = KeyBinder()
+        self._keybinder.listen_hold(configuration.modifier().xk_value, self._mod_down, self._mod_up)
+        self._keybinder.listen_hold(keys.ESC_KEY, self._esc_down, self._esc_up)
 
         for key_binding, window_class in KEY_BINDINGS.items():
             hotkey = configuration.modifier().string_value + key_binding
-            if not keybinder.bind_to_keys(hotkey, self._focus_window, window_class):
+            if not self._keybinder.bind_to_keys(hotkey, self._focus_window, window_class):
                 print(f'Failed binding key {key_binding} to open {window_class}')
 
-        keybinder.start()
+        self._keybinder.start()
 
         Gtk.main()
 
@@ -130,8 +126,8 @@ class Sifaka:
         return menu
 
     def _quit_app(self, _):
+        self._keybinder.stop()
         Gtk.main_quit()
-        # TODO: implement close
 
     def _open_configuration_window(self, _):
         ConfigurationGui().show()
