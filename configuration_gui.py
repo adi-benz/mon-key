@@ -135,7 +135,7 @@ class NewHotkeyDialog:
         self._entry_key.connect('changed', self._evaluate_input_validity)
 
     def run(self) -> Optional[Hotkey]:
-        response = self._dialog.run()
+        response = self._dialog._start_hold_listen()
         try:
             if response == Gtk.ResponseType.OK:
                 return Hotkey(

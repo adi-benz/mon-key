@@ -38,17 +38,18 @@ class XlibKeyBinder:
 
     def start(self):
         XlibKeybinder.init()
-        threading.Thread(target=self.run).start()
+        listener_thread = threading.Thread(target=self._start_hold_listen)
+        listener_thread.setDaemon(True)
+        listener_thread.start()
 
     def stop(self):
-        # TODO: Not really working
         self.clear_bindings()
         self.clear_listen_hold()
         self._display.ungrab_pointer(X.CurrentTime)
         self._display.record_disable_context(self._context)
         self._display.flush()
 
-    def run(self):
+    def _start_hold_listen(self):
         self._context = self._display.record_create_context(
             0,
             [record.AllClients],
