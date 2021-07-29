@@ -4,10 +4,10 @@ from typing import Optional
 
 import gi
 
-import keys
 from configuration import Configuration
 from configuration_gui import ConfigurationGui
 from key_binder import KeyBinder
+from keylistener import KeyListener
 from window_manager import WindowManager
 from windows_switcher import WindowsSwitcher
 
@@ -19,7 +19,7 @@ from gi.repository import AppIndicator3 as appindicator
 faulthandler.enable()
 
 
-class Sifaka:
+class Sifaka(KeyListener):
 
     def __init__(self):
         self._screen = Wnck.Screen.get_default()
@@ -28,26 +28,18 @@ class Sifaka:
         self._window_manager: WindowManager = WindowManager()
         self._window_manager.start()
         self._windows_switcher: Optional[WindowsSwitcher] = None
+        self._configuration = Configuration()
+        self._key_binder = KeyBinder(self._configuration, self)
 
     def start(self):
         self._build_app_indicator()
         Gtk.init([])
 
-        configuration = Configuration()
-        self._keybinder = KeyBinder()
-        self._keybinder.listen_hold(configuration.modifier().xk_value, self._mod_down, self._mod_up)
-        self._keybinder.listen_hold(keys.ESC_KEY, self._esc_down, self._esc_up)
-
-        for hotkey in configuration.hotkeys():
-            hotkey_string = configuration.modifier().string_value + hotkey.key
-            if not self._keybinder.bind_to_keys(hotkey_string, self._focus_window, hotkey.window_class_name):
-                print(f'Failed binding key {hotkey_string} to open {hotkey.window_class_name}')
-
-        self._keybinder.start()
+        self._key_binder.start()
 
         Gtk.main()
 
-    def _focus_window(self, keys, window_class_name):
+    def hotkey_pressed(self, keys: str, window_class_name: str):
         print(f"{keys} binding pressed")
         if not self._windows_switcher:
             self._create_window_switcher(window_class_name)
@@ -68,10 +60,10 @@ class Sifaka:
         server_time = GdkX11.x11_get_server_time(Gdk.get_default_root_window())
         return server_time
 
-    def _mod_down(self):
+    def modifier_down(self):
         print('_mod_down()')
 
-    def _mod_up(self):
+    def modifier_up(self):
         print('_mod_up()')
         if not self._windows_switcher:
             return
@@ -91,13 +83,10 @@ class Sifaka:
             self._windows_switcher.close()
         self._windows_switcher = None
 
-    def _esc_down(self):
+    def escape_pressed(self):
         if self._windows_switcher:
             self._windows_switcher.close()
             self._windows_switcher = None
-
-    def _esc_up(self):
-        pass
 
     def _build_app_indicator(self):
         self._indicator = appindicator.Indicator.new('sifaka', Gtk.STOCK_INFO,
@@ -118,7 +107,7 @@ class Sifaka:
         return menu
 
     def _quit_app(self, _):
-        self._keybinder.stop()
+        self._key_binder.stop()
         Gtk.main_quit()
 
     def _open_configuration_window(self, _):

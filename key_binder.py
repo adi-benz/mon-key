@@ -1,70 +1,31 @@
-import threading
-
-import gi
-from Xlib import X
-from Xlib.display import Display
-from Xlib.ext import record
-from Xlib.protocol import rq
-
-gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
-from gi.repository import Keybinder as XlibKeybinder
-from gi.repository import GLib
+import keys
+from configuration import Configuration
+from keylistener import KeyListener
+from xlib_key_binder import XlibKeyBinder
 
 
 class KeyBinder:
-
-    def __init__(self):
-        self._hold_keys = {}
-        self._display = Display()
-        self._context = None
-
-    def listen_hold(self, key, pressed_callback, released_callback):
-        self._hold_keys[key] = (pressed_callback, released_callback)
-
-    def bind_to_keys(self, keys, pressed_callback, *args):
-        return XlibKeybinder.bind(keys, pressed_callback, *args)
+    def __init__(self, configuration: Configuration, key_listener: KeyListener):
+        self._configuration = configuration
+        self._key_listener = key_listener
+        self._key_binder = XlibKeyBinder()
 
     def start(self):
-        XlibKeybinder.init()
-        threading.Thread(target=self.run).start()
+        self._key_binder.start()
+        self.reload_bindings()
 
     def stop(self):
-        # TODO: Not really working
-        self._display.ungrab_pointer(X.CurrentTime)
-        self._display.record_disable_context(self._context)
-        self._display.flush()
+        self._key_binder.stop()
 
-    def run(self):
-        self._context = self._display.record_create_context(
-            0,
-            [record.AllClients],
-            [{
-                'core_requests': (0, 0),
-                'core_replies': (0, 0),
-                'ext_requests': (0, 0, 0, 0),
-                'ext_replies': (0, 0, 0, 0),
-                'delivered_events': (0, 0),
-                'device_events': (X.KeyReleaseMask, X.ButtonReleaseMask),
-                'errors': (0, 0),
-                'client_started': False,
-                'client_died': False,
-            }])
-        self._display.record_enable_context(self._context, self._event_handler)
-        self._display.record_free_context(self._context)
-        self._display.close()
+    def reload_bindings(self):
+        modifier = self._configuration.modifier()
+        self._key_binder.listen_hold(modifier.xk_value,
+                                     self._key_listener.modifier_down, self._key_listener.modifier_up)
+        self._key_binder.listen_hold(keys.ESC_KEY, self._key_listener.escape_pressed, lambda: None)
 
-    def _event_handler(self, reply):
-        data = reply.data
-        while len(data):
-            event, data = rq.EventField(None).parse_binary_value(data, self._display.display, None, None)
+        for hotkey in self._configuration.hotkeys():
+            hotkey_string = modifier.string_value + hotkey.key
+            if not self._key_binder.bind_to_keys(hotkey_string, self._key_listener.hotkey_pressed,
+                                                 hotkey.window_class_name):
+                print(f'Failed binding key {hotkey_string} to open {hotkey.window_class_name}')
 
-            keysym = self._display.keycode_to_keysym(event.detail, 0)
-
-            if keysym in self._hold_keys.keys():
-                pressed_callback, released_callback = self._hold_keys[keysym]
-                if event.type == X.KeyPress:
-                    if pressed_callback:
-                        GLib.idle_add(pressed_callback)
-                elif event.type == X.KeyRelease:
-                    if released_callback:
-                        GLib.idle_add(released_callback)
