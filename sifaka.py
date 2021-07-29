@@ -18,14 +18,6 @@ from gi.repository import AppIndicator3 as appindicator
 
 faulthandler.enable()
 
-KEY_BINDINGS = {
-    'w': 'Google-chrome',
-    't': 'Tilix',
-    'c': 'jetbrains-pycharm-ce',
-    'q': 'okular',
-    'o': 'jetbrains-clion',
-}
-
 
 class Sifaka:
 
@@ -46,10 +38,10 @@ class Sifaka:
         self._keybinder.listen_hold(configuration.modifier().xk_value, self._mod_down, self._mod_up)
         self._keybinder.listen_hold(keys.ESC_KEY, self._esc_down, self._esc_up)
 
-        for key_binding, window_class in KEY_BINDINGS.items():
-            hotkey = configuration.modifier().string_value + key_binding
-            if not self._keybinder.bind_to_keys(hotkey, self._focus_window, window_class):
-                print(f'Failed binding key {key_binding} to open {window_class}')
+        for hotkey in configuration.hotkeys():
+            hotkey_string = configuration.modifier().string_value + hotkey.key
+            if not self._keybinder.bind_to_keys(hotkey_string, self._focus_window, hotkey.window_class_name):
+                print(f'Failed binding key {hotkey_string} to open {hotkey.window_class_name}')
 
         self._keybinder.start()
 
