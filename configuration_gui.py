@@ -4,6 +4,7 @@ import gi
 
 from configuration import Configuration
 from hotkey import Hotkey
+from key_binder import KeyBinder
 
 gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
 from gi.repository import Gtk
@@ -11,8 +12,9 @@ from gi.repository import Gtk
 
 class ConfigurationGui:
 
-    def __init__(self):
-        self._configuration = Configuration()
+    def __init__(self, configuration: Configuration, key_binder: KeyBinder):
+        self._configuration = configuration
+        self._key_binder = key_binder
         builder = Gtk.Builder()
         builder.add_from_file('ui/configuration-window.ui')
 
@@ -41,15 +43,19 @@ class ConfigurationGui:
             new_hotkey = response
             print(f'New hotkey, {new_hotkey.window_class_name}, {new_hotkey.key}')
             self._configuration.add_hotkey(new_hotkey)
-            self._show_hotkey(new_hotkey)
+            self._reload_hotkeys()
 
     def _hotkey_updated(self, hotkey: Hotkey, updated_hotkey: Hotkey):
         self._configuration.edit_hotkey(hotkey, updated_hotkey)
-        self._reload_hotkeys_listbox()
+        self._reload_hotkeys()
 
     def _hotkey_removed(self, hotkey: Hotkey):
         self._configuration.remove_hotkey(hotkey)
+        self._reload_hotkeys()
+
+    def _reload_hotkeys(self):
         self._reload_hotkeys_listbox()
+        self._key_binder.reload_bindings()
 
     def _reload_hotkeys_listbox(self):
         self._clear_hotkeys_list()

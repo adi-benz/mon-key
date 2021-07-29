@@ -26,12 +26,15 @@ class XlibKeyBinder:
         self._hold_keys.clear()
 
     def bind_to_keys(self, key_combination, pressed_callback, *args):
-        self._keys_bindings.append(key_combination)
-        return XlibKeybinder.bind(key_combination, pressed_callback, *args)
+        bind_successful = XlibKeybinder.bind(key_combination, pressed_callback, *args)
+        if bind_successful:
+            self._keys_bindings.append(key_combination)
+        return bind_successful
 
     def clear_bindings(self):
         for key_binding in self._keys_bindings:
-            XlibKeybinder.unbind_all(key_binding)
+            XlibKeybinder.unbind(key_binding)
+        self._keys_bindings.clear()
 
     def start(self):
         XlibKeybinder.init()

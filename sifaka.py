@@ -111,7 +111,7 @@ class Sifaka(KeyListener):
         Gtk.main_quit()
 
     def _open_configuration_window(self, _):
-        ConfigurationGui().show()
+        ConfigurationGui(self._configuration, self._key_binder).show()
 
 
 def main():
