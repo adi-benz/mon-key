@@ -3,6 +3,7 @@ from typing import Optional
 import gi
 
 import sifaka
+from configuration import Configuration
 from hotkey import Hotkey
 
 gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
@@ -12,6 +13,7 @@ from gi.repository import Gtk
 class ConfigurationGui:
 
     def __init__(self):
+        self._configuration = Configuration()
         builder = Gtk.Builder()
         builder.add_from_file('ui/configuration-window.ui')
 
@@ -19,10 +21,13 @@ class ConfigurationGui:
         self._hotkeys_list_box = builder.get_object('listBox_hotkeys')
         self._button_add_hotkey = builder.get_object('button_addHotkey')
         self._button_add_hotkey.connect('clicked', self._button_add_hotkey_clicked)
-        for i in range(10):
-            for key, window_class_name in sifaka.KEY_BINDINGS.items():
-                item = HotkeyListBoxRow(sifaka.MODIFIER, Hotkey(key, window_class_name))
-                self._hotkeys_list_box.add(item)
+
+        self._reload_hotkeys_listbox()
+
+    def _show_hotkey(self, hotkey):
+        item = HotkeyListBoxRow(hotkey, self._hotkey_updated, self._hotkey_removed)
+        self._hotkeys_list_box.add(item)
+        item.show_all()
 
     def show(self):
         self._window.show_all()
@@ -35,35 +40,66 @@ class ConfigurationGui:
         response = new_dialog.run()
         if response is not None:
             new_hotkey = response
-            print(f'new hotkey, {new_hotkey.window_class_name}, {new_hotkey.key}')
+            print(f'New hotkey, {new_hotkey.window_class_name}, {new_hotkey.key}')
+            self._configuration.add_hotkey(new_hotkey)
+            self._show_hotkey(new_hotkey)
+
+    def _hotkey_updated(self, hotkey: Hotkey, updated_hotkey: Hotkey):
+        self._configuration.edit_hotkey(hotkey, updated_hotkey)
+        self._reload_hotkeys_listbox()
+
+    def _hotkey_removed(self, hotkey: Hotkey):
+        self._configuration.remove_hotkey(hotkey)
+        self._reload_hotkeys_listbox()
+
+    def _reload_hotkeys_listbox(self):
+        self._clear_hotkeys_list()
+        for hotkey in self._configuration.hotkeys():
+            self._show_hotkey(hotkey)
+        self._hotkeys_list_box.show_all()
+
+    def _clear_hotkeys_list(self):
+        for child in self._hotkeys_list_box.get_children():
+            self._hotkeys_list_box.remove(child)
 
 
 class HotkeyListBoxRow(Gtk.ListBoxRow):
 
-    def __init__(self, modifier: sifaka.Modifier, hotkey: Hotkey):
+    def __init__(self, hotkey: Hotkey, edit_callback, remove_callback):
         super(Gtk.ListBoxRow, self).__init__()
         self._hotkey = hotkey
+        self._remove_callback = remove_callback
+        self._edit_callback = edit_callback
         builder = Gtk.Builder()
         builder.add_from_file('ui/configure-hotkey-list-item.ui')
 
         list_item = builder.get_object('list_item')
         self.add(list_item)
-        builder.get_object('label_windowClassName').set_label(hotkey.window_class_name)
-        builder.get_object('label_hotkeyDescription').set_label(modifier.string_value + '+' + hotkey.key)
+
+        self._label_windowClassName = builder.get_object('label_windowClassName')
+        self._label_hotkeyDescription = builder.get_object('label_hotkeyDescription')
         self._remove_button = builder.get_object('button_removeHotkey')
         self._remove_button.connect('clicked', self._button_remove_hotkey_clicked)
         self._button_edit_hotkey = builder.get_object('button_editHotkey')
         self._button_edit_hotkey.connect('clicked', self._button_edit_hotkey_clicked)
+
+        self._change_hotkey(hotkey)
+
+    def _change_hotkey(self, hotkey):
+        self._hotkey = hotkey
+        self._label_windowClassName.set_label(self._hotkey.window_class_name)
+        self._label_hotkeyDescription.set_label(sifaka.MODIFIER.string_value + '+' + hotkey.key)
 
     def _button_edit_hotkey_clicked(self, _button):
         edit_dialog = NewHotkeyDialog.edit_hotkey(self._hotkey)
         response = edit_dialog.run()
         if response is not None:
             updated_hotkey = response
-            print(f'new hotkey, {updated_hotkey.window_class_name}, {updated_hotkey.key}')
+            print(f'Hotkey edit, {updated_hotkey.window_class_name}, {updated_hotkey.key}')
+            self._edit_callback(self._hotkey, updated_hotkey)
 
-    def _button_remove_hotkey_clicked(self, button):
-        pass
+    def _button_remove_hotkey_clicked(self, _button):
+        self._remove_callback(self._hotkey)
 
 
 class NewHotkeyDialog:
@@ -97,8 +133,8 @@ class NewHotkeyDialog:
         try:
             if response == Gtk.ResponseType.OK:
                 return Hotkey(
-                    self._entry_window_class_name.get_text(),
-                    self._entry_key.get_text()
+                    self._entry_key.get_text(),
+                    self._entry_window_class_name.get_text()
                 )
             elif response == Gtk.ResponseType.CANCEL:
                 return None
