@@ -2,7 +2,6 @@ from typing import Optional
 
 import gi
 
-import sifaka
 from configuration import Configuration
 from hotkey import Hotkey
 
@@ -25,7 +24,7 @@ class ConfigurationGui:
         self._reload_hotkeys_listbox()
 
     def _show_hotkey(self, hotkey):
-        item = HotkeyListBoxRow(hotkey, self._hotkey_updated, self._hotkey_removed)
+        item = HotkeyListBoxRow(self._configuration, hotkey, self._hotkey_updated, self._hotkey_removed)
         self._hotkeys_list_box.add(item)
         item.show_all()
 
@@ -65,8 +64,9 @@ class ConfigurationGui:
 
 class HotkeyListBoxRow(Gtk.ListBoxRow):
 
-    def __init__(self, hotkey: Hotkey, edit_callback, remove_callback):
+    def __init__(self, configuration, hotkey: Hotkey, edit_callback, remove_callback):
         super(Gtk.ListBoxRow, self).__init__()
+        self._configuration = configuration
         self._hotkey = hotkey
         self._remove_callback = remove_callback
         self._edit_callback = edit_callback
@@ -88,7 +88,7 @@ class HotkeyListBoxRow(Gtk.ListBoxRow):
     def _change_hotkey(self, hotkey):
         self._hotkey = hotkey
         self._label_windowClassName.set_label(self._hotkey.window_class_name)
-        self._label_hotkeyDescription.set_label(sifaka.MODIFIER.string_value + '+' + hotkey.key)
+        self._label_hotkeyDescription.set_label(self._configuration.modifier().string_value + '+' + hotkey.key)
 
     def _button_edit_hotkey_clicked(self, _button):
         edit_dialog = NewHotkeyDialog.edit_hotkey(self._hotkey)
@@ -113,7 +113,7 @@ class NewHotkeyDialog:
         dialog = NewHotkeyDialog()
         dialog._entry_window_class_name.set_text(hotkey.window_class_name)
         dialog._entry_key.set_text(hotkey.key)
-        dialog._button_confirm.set_label('Edit')
+        dialog._button_confirm.set_label('Save')
         return dialog
 
     def __init__(self):

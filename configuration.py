@@ -4,6 +4,9 @@ from pathlib import Path
 from typing import List
 
 from hotkey import Hotkey
+from keys import Modifier
+
+DEFAULT_MODIFIER = Modifier.SUPER
 
 
 class Configuration:
@@ -18,12 +21,14 @@ class Configuration:
         if not self._HOTKEYS_FILE.exists():
             with self._HOTKEYS_FILE.open('w') as hotkeys_file:
                 json.dump({
-                    'modifier': 'Super',
+                    'modifier': DEFAULT_MODIFIER.string_value,
                     'hotkeys': []
                 }, hotkeys_file)
 
-    def modifier(self) -> str:
-        return self._read_configuration()['modifier']
+    def modifier(self) -> Modifier:
+        # TODO: Support saving modifier to configuration file
+        # return self._read_configuration()['modifier']
+        return Modifier.HYPER
 
     def hotkeys(self) -> List[Hotkey]:
         return [Hotkey(*x) for x in self._read_configuration()['hotkeys']]

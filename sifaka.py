@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 from enum import Enum
 from typing import Optional
@@ -6,30 +7,20 @@ import gi
 import faulthandler
 from Xlib import XK
 
+import keys
+from configuration import Configuration
+from configuration_gui import ConfigurationGui
 from key_binder import KeyBinder
 from window_manager import WindowManager
 from windows_switcher import WindowsSwitcher
 
-gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
+gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0", "AppIndicator3": "0.1"})
 # noinspection PyUnresolvedReferences
 from gi.repository import Gtk, Wnck, GdkX11, Gdk, GLib
+from gi.repository import AppIndicator3 as appindicator
 
 faulthandler.enable()
 
-
-ESC_KEY = XK.XK_Escape
-
-
-class Modifier(Enum):
-    HYPER = (XK.XK_Hyper_L, '<Hyper>')
-    SUPER = (XK.XK_Super_L, '<Super>')
-
-    def __init__(self, xk_value, string_value):
-        self.string_value = string_value
-        self.xk_value = xk_value
-
-
-MODIFIER = Modifier.HYPER
 KEY_BINDINGS = {
     'w': 'Google-chrome',
     't': 'Tilix',
@@ -50,15 +41,17 @@ class Sifaka:
         self._windows_switcher: Optional[WindowsSwitcher] = None
 
     def start(self):
+        self._build_app_indicator()
         Gtk.init([])
 
         keybinder = KeyBinder()
 
-        keybinder.listen_hold(MODIFIER.xk_value, self._mod_down, self._mod_up)
-        keybinder.listen_hold(ESC_KEY, self._esc_down, self._esc_up)
+        configuration = Configuration()
+        keybinder.listen_hold(configuration.modifier().xk_value, self._mod_down, self._mod_up)
+        keybinder.listen_hold(keys.ESC_KEY, self._esc_down, self._esc_up)
 
         for key_binding, window_class in KEY_BINDINGS.items():
-            hotkey = MODIFIER.string_value + key_binding
+            hotkey = configuration.modifier().string_value + key_binding
             if not keybinder.bind_to_keys(hotkey, self._focus_window, window_class):
                 print(f'Failed binding key {key_binding} to open {window_class}')
 
@@ -117,6 +110,31 @@ class Sifaka:
 
     def _esc_up(self):
         pass
+
+    def _build_app_indicator(self):
+        self._indicator = appindicator.Indicator.new('sifaka', Gtk.STOCK_INFO,
+                                                     appindicator.IndicatorCategory.SYSTEM_SERVICES)
+        self._indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
+        self._indicator.set_menu(self._build_app_indicator_menu())
+
+    def _build_app_indicator_menu(self):
+        menu = Gtk.Menu()
+        configuration_item = Gtk.MenuItem(label='Configure hotkeys')
+        configuration_item.connect('activate', self._open_configuration_window)
+        menu.append(configuration_item)
+        menu.append(Gtk.SeparatorMenuItem())
+        quit_item = Gtk.MenuItem(label='Quit')
+        quit_item.connect('activate', self._quit_app)
+        menu.append(quit_item)
+        menu.show_all()
+        return menu
+
+    def _quit_app(self, _):
+        Gtk.main_quit()
+        # TODO: implement close
+
+    def _open_configuration_window(self, _):
+        ConfigurationGui().show()
 
 
 def main():
