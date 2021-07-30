@@ -45,7 +45,6 @@ class XlibKeyBinder:
     def stop(self):
         self.clear_bindings()
         self.clear_listen_hold()
-        self._display.ungrab_pointer(X.CurrentTime)
         self._display.record_disable_context(self._context)
         self._display.flush()
 
