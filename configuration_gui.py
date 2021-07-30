@@ -2,6 +2,7 @@ from typing import Optional
 
 import gi
 
+import xlocate_window
 from configuration import Configuration
 from hotkey import Hotkey
 from key_binder import KeyBinder
@@ -128,6 +129,8 @@ class NewHotkeyDialog:
 
         self._dialog = builder.get_object('dialog_newHotkey')
         self._button_confirm = builder.get_object('button_confirm')
+        self._button_locate = builder.get_object('button_locate')
+        self._button_locate.connect('clicked', self._locate_window)
         self._entry_window_class_name = builder.get_object('entry_windowClassName')
         self._entry_key = builder.get_object('entry_key')
 
@@ -146,6 +149,14 @@ class NewHotkeyDialog:
                 return None
         finally:
             self._dialog.destroy()
+
+    def _locate_window(self, _):
+        chosen_window = xlocate_window.choose_window_by_cursor()
+
+        chosen_window_class_name = chosen_window.get_wm_class()
+        if chosen_window_class_name:
+            self._entry_window_class_name.set_text(chosen_window_class_name[0])
+            self._entry_window_class_name.show_all()
 
     def _evaluate_input_validity(self, _):
         if len(self._entry_window_class_name.get_text().strip()) > 0 and len(self._entry_key.get_text().strip()) > 0:
