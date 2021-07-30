@@ -16,7 +16,7 @@ class ConfigurationGui:
         self._configuration = configuration
         self._key_binder = key_binder
         builder = Gtk.Builder()
-        builder.add_from_file('ui/configuration-window.ui')
+        builder.add_from_file('ui/configuration-window.glade')
 
         self._window = builder.get_object('window_configuration')
         self._hotkeys_list_box = builder.get_object('listBox_hotkeys')
@@ -77,7 +77,7 @@ class HotkeyListBoxRow(Gtk.ListBoxRow):
         self._remove_callback = remove_callback
         self._edit_callback = edit_callback
         builder = Gtk.Builder()
-        builder.add_from_file('ui/configure-hotkey-list-item.ui')
+        builder.add_from_file('ui/configure-hotkey-list-item.glade')
 
         list_item = builder.get_object('list_item')
         self.add(list_item)
@@ -124,7 +124,7 @@ class NewHotkeyDialog:
 
     def __init__(self):
         builder = Gtk.Builder()
-        builder.add_from_file('ui/new-hotkey-dialog.ui')
+        builder.add_from_file('ui/new-hotkey-dialog.glade')
 
         self._dialog = builder.get_object('dialog_newHotkey')
         self._button_confirm = builder.get_object('button_confirm')
@@ -135,7 +135,7 @@ class NewHotkeyDialog:
         self._entry_key.connect('changed', self._evaluate_input_validity)
 
     def run(self) -> Optional[Hotkey]:
-        response = self._dialog._start_hold_listen()
+        response = self._dialog.run()
         try:
             if response == Gtk.ResponseType.OK:
                 return Hotkey(

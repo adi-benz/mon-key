@@ -13,7 +13,7 @@ class WindowsSwitcherGui:
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         builder = Gtk.Builder()
-        builder.add_from_file('ui/popup-window.ui')
+        builder.add_from_file('ui/popup-window.glade')
 
         self._window = builder.get_object('popup-window')
         self._list_box = builder.get_object('windows-list')
@@ -53,7 +53,7 @@ class WindowListBoxRow(Gtk.ListBoxRow):
     def __init__(self, window_name, workspace_name):
         super(Gtk.ListBoxRow, self).__init__()
         builder = Gtk.Builder()
-        builder.add_from_file('ui/list-item.ui')
+        builder.add_from_file('ui/list-item.glade')
 
         list_item = builder.get_object('list-item')
         self.add(list_item)
