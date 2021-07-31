@@ -31,9 +31,9 @@ class Configuration:
     def hotkeys(self) -> List[Hotkey]:
         return [Hotkey(*x) for x in self._read_configuration()['hotkeys']]
 
-    def set_modifier(self, new_modifier: str):
+    def set_modifier(self, new_modifier: Modifier):
         new_configuration = self._read_configuration()
-        new_configuration['modifier'] = new_modifier
+        new_configuration['modifier'] = new_modifier.name
         with self._HOTKEYS_FILE.open('w') as hotkeys_file:
             json.dump(new_configuration, hotkeys_file)
 

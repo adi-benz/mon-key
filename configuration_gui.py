@@ -4,6 +4,7 @@ import gi
 
 import xlocate_window
 from configuration import Configuration
+from preferences_dialog import PreferencesDialog
 from hotkey import Hotkey
 from key_binder import KeyBinder
 
@@ -20,6 +21,8 @@ class ConfigurationGui:
         builder.add_from_file('ui/configuration-window.glade')
 
         self._window = builder.get_object('window_configuration')
+        self._button_preferences = builder.get_object('button_preferences')
+        self._button_preferences.connect('clicked', self._open_preferences)
         self._hotkeys_list_box = builder.get_object('listBox_hotkeys')
         self._button_add_hotkey = builder.get_object('button_addHotkey')
         self._button_add_hotkey.connect('clicked', self._button_add_hotkey_clicked)
@@ -36,6 +39,10 @@ class ConfigurationGui:
 
     def close(self):
         self._window.close()
+
+    def _open_preferences(self, _):
+        dialog = PreferencesDialog(self._configuration)
+        dialog.run()
 
     def _button_add_hotkey_clicked(self, _button):
         new_dialog = NewHotkeyDialog.new_hotkey()
@@ -163,9 +170,3 @@ class NewHotkeyDialog:
             self._button_confirm.set_sensitive(True)
         else:
             self._button_confirm.set_sensitive(False)
-
-
-if __name__ == '__main__':
-    Gtk.init([])
-    ConfigurationGui().show()
-    Gtk.main()

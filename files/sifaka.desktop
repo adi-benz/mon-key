@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Sifaka
+GenericName=Keyboard Automation
+Comment=Switch application windows fast
+Exec=/home/adi/Development/sifaka/sifaka-run.sh
+Terminal=false
+Type=Application
+Icon=todo
+Categories=GNOME;GTK;Utility;
