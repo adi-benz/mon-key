@@ -2,13 +2,15 @@ from gi.overrides import Gtk
 
 from configuration import Configuration
 from desktop_entry import DesktopEntry
+from key_binder import KeyBinder
 from keys import Modifier
 
 
 class PreferencesDialog:
 
-    def __init__(self, configuration: Configuration):
+    def __init__(self, configuration: Configuration, key_binder: KeyBinder):
         self._configuration = configuration
+        self._key_binder = key_binder
         self._desktop_entry = DesktopEntry()
         builder = Gtk.Builder()
         builder.add_from_file('ui/preferences-dialog.glade')
@@ -55,6 +57,7 @@ class PreferencesDialog:
 
         print(f'modified {modifier.name}')
         self._configuration.set_modifier(modifier)
+        self._key_binder.reload_bindings()
 
         self._refresh_widgets()
 

@@ -41,7 +41,7 @@ class ConfigurationGui:
         self._window.close()
 
     def _open_preferences(self, _):
-        dialog = PreferencesDialog(self._configuration)
+        dialog = PreferencesDialog(self._configuration, self._key_binder)
         dialog.run()
 
     def _button_add_hotkey_clicked(self, _button):
