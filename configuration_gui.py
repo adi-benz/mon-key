@@ -26,6 +26,10 @@ class ConfigurationGui:
         self._hotkeys_list_box = builder.get_object('listBox_hotkeys')
         self._button_add_hotkey = builder.get_object('button_addHotkey')
         self._button_add_hotkey.connect('clicked', self._button_add_hotkey_clicked)
+        self._menu_item_about = builder.get_object('menuItem_about')
+        self._menu_item_about.connect('activate', self._menu_item_about_activate)
+        self._menu_item_quit = builder.get_object('menuItem_quit')
+        self._menu_item_quit.connect('activate', self._menu_item_quit_activate)
 
         self._reload_hotkeys_listbox()
 
@@ -74,6 +78,16 @@ class ConfigurationGui:
     def _clear_hotkeys_list(self):
         for child in self._hotkeys_list_box.get_children():
             self._hotkeys_list_box.remove(child)
+
+    def _menu_item_about_activate(self, _):
+        builder = Gtk.Builder()
+        builder.add_from_file('ui/about-dialog.glade')
+        dialog = builder.get_object("dialog")
+        dialog.run()
+        dialog.destroy()
+
+    def _menu_item_quit_activate(self, _):
+        Gtk.main_quit()
 
 
 class HotkeyListBoxRow(Gtk.ListBoxRow):

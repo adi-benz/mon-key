@@ -39,6 +39,7 @@ class MonKey(KeyListener):
         self._key_binder.start()
 
         Gtk.main()
+        self._key_binder.stop()
 
     def hotkey_pressed(self, keys: str, window_class_name: str):
         print(f"{keys} binding pressed")
@@ -108,7 +109,6 @@ class MonKey(KeyListener):
         return menu
 
     def _quit_app(self, _):
-        self._key_binder.stop()
         Gtk.main_quit()
 
     def _open_configuration_window(self, _):
