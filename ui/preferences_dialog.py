@@ -13,7 +13,7 @@ class PreferencesDialog:
         self._key_binder = key_binder
         self._desktop_entry = DesktopEntry()
         builder = Gtk.Builder()
-        builder.add_from_file('ui/preferences-dialog.glade')
+        builder.add_from_file('ui/glade_files/preferences-dialog.glade')
 
         self._dialog = builder.get_object('dialog')
         self._box_modifier_buttons = builder.get_object('box_modifierButtons')

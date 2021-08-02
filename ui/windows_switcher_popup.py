@@ -8,12 +8,12 @@ class WindowsSwitcherPopup:
 
     def __init__(self):
         provider = Gtk.CssProvider()
-        provider.load_from_path("ui/style.css")
+        provider.load_from_path("ui/glade_files/style.css")
         Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider,
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         builder = Gtk.Builder()
-        builder.add_from_file('ui/window-switcher-popup.glade')
+        builder.add_from_file('ui/glade_files/window-switcher-popup.glade')
 
         self._window = builder.get_object('popup-window')
         self._list_box = builder.get_object('windows-list')
@@ -53,7 +53,7 @@ class WindowListBoxRow(Gtk.ListBoxRow):
     def __init__(self, window_name, workspace_name):
         super(Gtk.ListBoxRow, self).__init__()
         builder = Gtk.Builder()
-        builder.add_from_file('ui/list-item.glade')
+        builder.add_from_file('ui/glade_files/list-item.glade')
 
         list_item = builder.get_object('list-item')
         self.add(list_item)

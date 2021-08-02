@@ -18,7 +18,7 @@ class MainWindow:
         self._configuration = configuration
         self._key_binder = key_binder
         builder = Gtk.Builder()
-        builder.add_from_file('ui/main-window.glade')
+        builder.add_from_file('ui/glade_files/main-window.glade')
 
         self._window = builder.get_object('main_window')
         self._button_preferences = builder.get_object('button_preferences')
@@ -81,7 +81,7 @@ class MainWindow:
 
     def _menu_item_about_activate(self, _):
         builder = Gtk.Builder()
-        builder.add_from_file('ui/about-dialog.glade')
+        builder.add_from_file('ui/glade_files/about-dialog.glade')
         dialog = builder.get_object("dialog")
         dialog.run()
         dialog.destroy()
@@ -99,7 +99,7 @@ class HotkeyListBoxRow(Gtk.ListBoxRow):
         self._remove_callback = remove_callback
         self._edit_callback = edit_callback
         builder = Gtk.Builder()
-        builder.add_from_file('ui/configure-hotkey-list-item.glade')
+        builder.add_from_file('ui/glade_files/configure-hotkey-list-item.glade')
 
         list_item = builder.get_object('list_item')
         self.add(list_item)
@@ -150,7 +150,7 @@ class EditHotkeyDialog:
 
     def __init__(self):
         builder = Gtk.Builder()
-        builder.add_from_file('ui/edit-hotkey-dialog.glade')
+        builder.add_from_file('ui/glade_files/edit-hotkey-dialog.glade')
 
         self._dialog = builder.get_object('dialog_editHotkey')
         self._button_confirm = builder.get_object('button_confirm')

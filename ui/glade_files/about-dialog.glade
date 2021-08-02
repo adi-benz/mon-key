@@ -11,7 +11,7 @@
     <property name="comments" translatable="yes">A fast, application oriented Alt-Tab</property>
     <property name="website">https://github.com/adi-benz/mon-key</property>
     <property name="artists">Icon made by freepik.com from flaticon.com</property>
-    <property name="logo">../files/monkey-head.png</property>
+    <property name="logo">../../files/monkey-head.png</property>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can-focus">False</property>
