@@ -8,7 +8,7 @@
     <property name="program-name">MonKey</property>
     <property name="version">0.1</property>
     <property name="copyright" translatable="yes">Adi Benziony</property>
-    <property name="comments" translatable="yes">A fast, application oriented Alt-Tab</property>
+    <property name="comments" translatable="yes">A fast, application oriented Alt-Tab for X11</property>
     <property name="website">https://github.com/adi-benz/mon-key</property>
     <property name="artists">Icon made by freepik.com from flaticon.com</property>
     <property name="logo">../../files/monkey-head.png</property>
