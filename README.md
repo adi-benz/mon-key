@@ -1,4 +1,4 @@
-# Monkey 🐒
+# MonKey 🐒
 A fast, application oriented Alt-Tab for X11.
 
 **Include an example screen-cast**
