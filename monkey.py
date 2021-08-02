@@ -5,7 +5,7 @@ from typing import Optional
 import gi
 
 from configuration import Configuration
-from configuration_gui import ConfigurationGui
+from ui.main_window import MainWindow
 from desktop_entry import DesktopEntry
 from key_binder import KeyBinder
 from keylistener import KeyListener
@@ -112,7 +112,7 @@ class MonKey(KeyListener):
         Gtk.main_quit()
 
     def _open_configuration_window(self, _):
-        ConfigurationGui(self._configuration, self._key_binder).show()
+        MainWindow(self._configuration, self._key_binder).show()
 
 
 def main():

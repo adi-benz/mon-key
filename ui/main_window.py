@@ -1,26 +1,26 @@
 from typing import Optional
 
-import gi
 
 import xlocate_window
 from configuration import Configuration
-from preferences_dialog import PreferencesDialog
+from .preferences_dialog import PreferencesDialog
 from hotkey import Hotkey
 from key_binder import KeyBinder
 
-gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
+import gi
+gi.require_versions({"Gtk": "3.0"})
 from gi.repository import Gtk
 
 
-class ConfigurationGui:
+class MainWindow:
 
     def __init__(self, configuration: Configuration, key_binder: KeyBinder):
         self._configuration = configuration
         self._key_binder = key_binder
         builder = Gtk.Builder()
-        builder.add_from_file('ui/configuration-window.glade')
+        builder.add_from_file('ui/main-window.glade')
 
-        self._window = builder.get_object('window_configuration')
+        self._window = builder.get_object('main_window')
         self._button_preferences = builder.get_object('button_preferences')
         self._button_preferences.connect('clicked', self._open_preferences)
         self._hotkeys_list_box = builder.get_object('listBox_hotkeys')
@@ -49,7 +49,7 @@ class ConfigurationGui:
         dialog.run()
 
     def _button_add_hotkey_clicked(self, _button):
-        new_dialog = NewHotkeyDialog.new_hotkey()
+        new_dialog = EditHotkeyDialog.new_hotkey()
         response = new_dialog.run()
         if response is not None:
             new_hotkey = response
@@ -119,7 +119,7 @@ class HotkeyListBoxRow(Gtk.ListBoxRow):
         self._label_hotkeyDescription.set_label(self._configuration.modifier().string_value + '+' + hotkey.key)
 
     def _button_edit_hotkey_clicked(self, _button):
-        edit_dialog = NewHotkeyDialog.edit_hotkey(self._hotkey)
+        edit_dialog = EditHotkeyDialog.edit_hotkey(self._hotkey)
         response = edit_dialog.run()
         if response is not None:
             updated_hotkey = response
@@ -130,15 +130,19 @@ class HotkeyListBoxRow(Gtk.ListBoxRow):
         self._remove_callback(self._hotkey)
 
 
-class NewHotkeyDialog:
+class EditHotkeyDialog:
 
     @classmethod
     def new_hotkey(cls):
-        return NewHotkeyDialog()
+        dialog = EditHotkeyDialog()
+        dialog._dialog.set_title('New hotkey')
+        dialog._button_confirm.set_label('Create')
+        return dialog
 
     @classmethod
     def edit_hotkey(cls, hotkey: Hotkey):
-        dialog = NewHotkeyDialog()
+        dialog = EditHotkeyDialog()
+        dialog._dialog.set_title('Edit hotkey')
         dialog._entry_window_class_name.set_text(hotkey.window_class_name)
         dialog._entry_key.set_text(hotkey.key)
         dialog._button_confirm.set_label('Save')
@@ -146,9 +150,9 @@ class NewHotkeyDialog:
 
     def __init__(self):
         builder = Gtk.Builder()
-        builder.add_from_file('ui/new-hotkey-dialog.glade')
+        builder.add_from_file('ui/edit-hotkey-dialog.glade')
 
-        self._dialog = builder.get_object('dialog_newHotkey')
+        self._dialog = builder.get_object('dialog_editHotkey')
         self._button_confirm = builder.get_object('button_confirm')
         self._button_locate = builder.get_object('button_locate')
         self._button_locate.connect('clicked', self._locate_window)

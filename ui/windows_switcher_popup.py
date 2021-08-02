@@ -4,7 +4,7 @@ gi.require_versions({"Gtk": "3.0", "Keybinder": "3.0", "Wnck": "3.0"})
 from gi.repository import Gtk, Gdk
 
 
-class WindowsSwitcherGui:
+class WindowsSwitcherPopup:
 
     def __init__(self):
         provider = Gtk.CssProvider()
@@ -13,7 +13,7 @@ class WindowsSwitcherGui:
                                                  Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         builder = Gtk.Builder()
-        builder.add_from_file('ui/popup-window.glade')
+        builder.add_from_file('ui/window-switcher-popup.glade')
 
         self._window = builder.get_object('popup-window')
         self._list_box = builder.get_object('windows-list')
