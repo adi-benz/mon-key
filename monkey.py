@@ -1,5 +1,10 @@
 import faulthandler
+import logging
+import logging.handlers
+import os
+import sys
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 import gi
@@ -19,6 +24,9 @@ faulthandler.enable()
 
 
 class MonKey(KeyListener):
+    _XDG_DATA_HOME = Path(os.environ.get('XDG_DATA_HOME', os.path.expanduser("~/.local/share"))) / 'MonKey'
+    _LOG_PATH = _XDG_DATA_HOME / 'monkey.log'
+    _LOG_FORMAT = "%(asctime)s %(levelname)s - %(name)s - %(message)s"
 
     def __init__(self):
         self._window_manager: WindowManager = WindowManager()
@@ -29,6 +37,7 @@ class MonKey(KeyListener):
         self._tray_icon = TrayIcon(self._configuration, self._key_binder)
 
     def start(self):
+        self._initialize_logging()
         self._tray_icon.show()
         Gtk.init([])
 
@@ -37,8 +46,24 @@ class MonKey(KeyListener):
         Gtk.main()
         self._key_binder.stop()
 
+    def _initialize_logging(self):
+        logger = logging.getLogger()
+        logger.setLevel(logging.NOTSET)
+
+        self._LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        file_handler = logging.handlers.RotatingFileHandler(self._LOG_PATH,
+                                                            maxBytes=5 * 1024 * 1024, backupCount=3)
+        file_handler.setFormatter(logging.Formatter(self._LOG_FORMAT))
+        file_handler.setLevel(logging.INFO)
+        logger.addHandler(file_handler)
+
+        stdout_handler = logging.StreamHandler(sys.stdout)
+        stdout_handler.setFormatter(logging.Formatter(self._LOG_FORMAT))
+        stdout_handler.setLevel(logging.DEBUG)
+        logger.addHandler(stdout_handler)
+
     def hotkey_pressed(self, keys: str, window_class_name: str):
-        print(f"{keys} binding pressed")
+        logging.debug(f"{keys} binding pressed")
         if not self._windows_switcher:
             self._create_window_switcher(window_class_name)
         elif self._windows_switcher.get_class_name() != window_class_name:
@@ -59,10 +84,9 @@ class MonKey(KeyListener):
         return server_time
 
     def modifier_down(self):
-        print('_mod_down()')
+        pass
 
     def modifier_up(self):
-        print('_mod_up()')
         if not self._windows_switcher:
             return
 

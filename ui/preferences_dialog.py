@@ -1,3 +1,5 @@
+import logging
+
 from gi.overrides import Gtk
 
 from configuration import Configuration
@@ -55,7 +57,7 @@ class PreferencesDialog:
         if current_modifier == modifier:
             return
 
-        print(f'modified {modifier.name}')
+        logging.info(f'Changed to use modifier {modifier.name}')
         self._configuration.set_modifier(modifier)
         self._key_binder.reload_bindings()
 

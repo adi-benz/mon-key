@@ -1,3 +1,5 @@
+import logging
+
 import keys
 from configuration import Configuration
 from keylistener import KeyListener
@@ -28,8 +30,8 @@ class KeyBinder:
 
         for hotkey in self._configuration.hotkeys():
             hotkey_string = modifier.string_value + hotkey.key
-            print(f'Binding key {hotkey_string} to open {hotkey.window_class_name}')
+            logging.debug(f'Binding key {hotkey_string} to open {hotkey.window_class_name}')
             if not self._xkey_binder.bind_to_keys(hotkey_string, self._key_listener.hotkey_pressed,
                                                   hotkey.window_class_name):
-                print(f'Failed binding key {hotkey_string} to open {hotkey.window_class_name}')
+                logging.info(f'Failed binding key {hotkey_string} to open {hotkey.window_class_name}')
 

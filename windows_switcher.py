@@ -1,3 +1,5 @@
+import logging
+
 from window_manager import WindowManager
 from ui.windows_switcher_popup import WindowsSwitcherPopup
 
@@ -15,7 +17,7 @@ class WindowsSwitcher:
         self._class_name = class_name
         self._windows = list(self._window_manager.get_windows(self._class_name))
         for window in self._windows:
-            print(f'\t{window.get_name()}')
+            logging.debug(f'\t{window.get_name()}')
         active_window = self._window_manager.get_active_window()
         if any(self._windows):
             self._windows_switcher_gui = WindowsSwitcherPopup()

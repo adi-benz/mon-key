@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 
@@ -53,7 +54,7 @@ class MainWindow:
         response = new_dialog.run()
         if response is not None:
             new_hotkey = response
-            print(f'New hotkey, {new_hotkey.window_class_name}, {new_hotkey.key}')
+            logging.info(f'New hotkey, {new_hotkey.window_class_name}, {new_hotkey.key}')
             self._configuration.add_hotkey(new_hotkey)
             self._reload_hotkeys()
 
@@ -123,7 +124,7 @@ class HotkeyListBoxRow(Gtk.ListBoxRow):
         response = edit_dialog.run()
         if response is not None:
             updated_hotkey = response
-            print(f'Hotkey edit, {updated_hotkey.window_class_name}, {updated_hotkey.key}')
+            logging.info(f'Hotkey edit, {updated_hotkey.window_class_name}, {updated_hotkey.key}')
             self._edit_callback(self._hotkey, updated_hotkey)
 
     def _button_remove_hotkey_clicked(self, _button):

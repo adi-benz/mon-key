@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 
 import gi
@@ -35,7 +36,7 @@ class WindowManager:
     def _active_window_changed(self, screen, _):
         active_window = screen.get_active_window()
         if active_window:
-            print(f'Focus changed to {active_window.get_name()}')
+            logging.debug(f'Focus changed to {active_window.get_name()}')
             self._add_window(active_window)
 
     def _add_window(self, window):
