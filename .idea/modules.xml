@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/sifaka.iml" filepath="$PROJECT_DIR$/.idea/sifaka.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/mon-key.iml" filepath="$PROJECT_DIR$/.idea/mon-key.iml" />
     </modules>
   </component>
 </project>

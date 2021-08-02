@@ -6,6 +6,7 @@ import gi
 
 from configuration import Configuration
 from configuration_gui import ConfigurationGui
+from desktop_entry import DesktopEntry
 from key_binder import KeyBinder
 from keylistener import KeyListener
 from window_manager import WindowManager
@@ -19,7 +20,7 @@ from gi.repository import AppIndicator3 as appindicator
 faulthandler.enable()
 
 
-class Sifaka(KeyListener):
+class MonKey(KeyListener):
 
     def __init__(self):
         self._screen = Wnck.Screen.get_default()
@@ -89,7 +90,7 @@ class Sifaka(KeyListener):
             self._windows_switcher = None
 
     def _build_app_indicator(self):
-        self._indicator = appindicator.Indicator.new('sifaka', Gtk.STOCK_INFO,
+        self._indicator = appindicator.Indicator.new('MonKey', str(DesktopEntry.ICON_PATH),
                                                      appindicator.IndicatorCategory.SYSTEM_SERVICES)
         self._indicator.set_status(appindicator.IndicatorStatus.ACTIVE)
         self._indicator.set_menu(self._build_app_indicator_menu())
@@ -115,7 +116,7 @@ class Sifaka(KeyListener):
 
 
 def main():
-    Sifaka().start()
+    MonKey().start()
 
 
 if __name__ == '__main__':

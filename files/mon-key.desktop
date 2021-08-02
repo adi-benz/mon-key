@@ -1,9 +1,9 @@
 [Desktop Entry]
-Name=Sifaka
+Name=MonKey
 GenericName=Keyboard Automation
 Comment=Switch application windows fast
-Exec=/home/adi/Development/sifaka/sifaka-run.sh
+Exec={exec}
 Terminal=false
 Type=Application
-Icon=todo
+Icon={icon}
 Categories=GNOME;GTK;Utility;

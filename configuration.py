@@ -11,7 +11,7 @@ DEFAULT_MODIFIER = Modifier.SUPER
 
 class Configuration:
     _XDG_CONFIG_HOME = Path(os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config')))
-    _CONFIG_DIR = _XDG_CONFIG_HOME / "sifaka"
+    _CONFIG_DIR = _XDG_CONFIG_HOME / "monkey"
     _HOTKEYS_FILE = _CONFIG_DIR / "hotkeys.json"
 
     def __init__(self):
