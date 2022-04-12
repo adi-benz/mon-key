@@ -1,11 +1,11 @@
 import gi
+gi.require_versions({"Gtk": "3.0", "AppIndicator3": "0.1"})
 
 from configuration import Configuration
 from desktop_entry import DesktopEntry
 from key_binder import KeyBinder
 from ui.main_window import MainWindow
 
-gi.require_versions({"Gtk": "3.0", "AppIndicator3": "0.1"})
 from gi.repository import Gtk, AppIndicator3
 
 
